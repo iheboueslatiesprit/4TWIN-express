@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var app = express();
 //bezkoder
 var  cors = require('cors');
 var corsOptions = {
@@ -20,7 +20,12 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var osRouter = require('./routes/os');
 var productsRouter = require('./routes/products');
-var app = express();
+var tutorialsRouter = require('./routes/tutorials');
+//bezkoder : simple route jj
+app.get('/' , (req , res)=>{
+  res.json({message: "welcome to my personal app"});
+});
+
 
 
 
@@ -40,13 +45,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/os',osRouter);
 app.use('/products',productsRouter);
- 
-//bezkoder : simple route jj
-app.get('/' , (req , res)=>{
-
-   res.json({message: "welcome to my personal app"});
-
-});
+app.use('/tutorials', tutorialsRouter);
 
 const port = process.env.PORT || 5000;
 
@@ -65,7 +64,7 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error' , { title: err.message});
 });
  
 //bezkoder
