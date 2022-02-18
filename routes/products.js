@@ -1,10 +1,6 @@
 const router = require('express').Router()
 const fs = require('fs');
 
-
-
-
-
 router.get('/' , (req , res)=>{
  fs.readFile('products.json', (err, data) => {
    res.send( JSON.parse(data) );
