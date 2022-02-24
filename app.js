@@ -1,86 +1,91 @@
-var createError = require('http-errors');
 var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var app = express();
-//bezkoder
 var  cors = require('cors');
+const dbConfig = require("./config/db.config");
+var app = express();
 var corsOptions = {
   origin: "http://localhost:8081"
 };
-const db = require("./models");
-//bezkoder : listen for requests
-//const PORT = process.env.PORT || 8080 ;
-
-
-
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var osRouter = require('./routes/os');
-var productsRouter = require('./routes/products');
-var tutorialsRouter = require('./routes/tutorials');
-//bezkoder : simple route jj
-app.get('/' , (req , res)=>{
-  res.json({message: "welcome to my personal app"});
-});
-
-
-
+var createError = require('http-errors');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var bodyParser = require('body-parser');
 
 app.use(cors(corsOptions));
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-app.use(logger('dev'));
 app.use(express.json());
-//bezkoder : changed to true
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/os',osRouter);
-app.use('/products',productsRouter);
-app.use('/tutorials', tutorialsRouter);
+const db = require("./models")
+const Role = require('./models/role.model');
 
-const port = process.env.PORT || 5000;
-
-app.listen(port, () => `Server running on port ${port} `);
-
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error' , { title: err.message});
-});
- 
 //bezkoder
 db.mongoose
-  .connect(db.url, {
+  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   .then(() => {
-    console.log("Connected to the database!");
-    console.log("Port  "+process . env.PORT);
+    console.log("Successfully connect to MongoDB.");
+    initial();
   })
   .catch(err => {
-    console.log("Cannot connect to the database!", err);
+    console.error("Connection error", err);
     process.exit();
   });
 
+  require('./routes/auth.routes')(app);
+  require('./routes/user.routes')(app);
+ // var authRouter = require('./routes/auth.routes');
+ //var userRouter = require('./routes/user.routes');
+ /* esvar indexRouter = require('./routes/index');
+ var usersRouter = require('./routes/users');
+ var osRouter = require('./routes/os');
+ var productsRouter = require('./routes/products');
+ var tutorialsRouter = require('./routes/tutorials'); 
+ 
+//app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/os',osRouter);
+app.use('/products',productsRouter); */
+//app.use('/', authRouter);
+//app.use('/', userRouter);
 
+const port = process.env.PORT || 5000;
+
+app.listen(port , () => `Server running on port ${port} `);
+
+//bezkoder nodejsmongodbauthjwt
+function initial() {
+  Role.estimatedDocumentCount((err, count) => {
+    if (!err && count === 0) {
+      new Role({
+        name: "user"
+      }).save(err => {
+        if (err) {
+          console.log("error ", err);
+        }
+        console.log(" added user role successfully");
+      });
+      new Role({
+        name: "admin"
+      }).save(err => {
+        if (err) {
+          console.log("error", err);
+        }
+        console.log("added admin role successfully");
+      });
+      new Role({
+        name: "moderator"
+      }).save(err => {
+        if (err) {
+          console.log("error ", err);
+        }
+        console.log(" moderator role added successfuly");
+      });
+    }
+  });
+}
+
+//bezkoder : listen for requests
+//const PORT = process.env.PORT || 8080 ;
 module.exports = app;
