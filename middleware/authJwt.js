@@ -13,7 +13,10 @@ verifyToken = (req, res, next) => {
     if (err) {
       return res.status(401).send({ message: " unothorized " });
     }
+    req.userId = decoded.id ; 
+    next();
   });
+
 }; 
 
 isAdmin = (req , res , next ) => {
@@ -33,7 +36,7 @@ isAdmin = (req , res , next ) => {
               return;
             }
           }
-            res.status(403).send({ message: "forbidden !" });
+            res.status(403).send({ message: "admin space : forbidden !" });
             return ; 
         }
          ) ;
@@ -57,6 +60,8 @@ isModerator = ( req , res , next ) => {
         return;
       }
     }
+    res.status(403).send({ message: "modspace : forbidden !" });
+    return ; 
     }
     );
   });
