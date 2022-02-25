@@ -1,6 +1,17 @@
 const db = require("../models");
 const Tutorial = db.tutorials;
 
+const getPagination = (page , size ) => { 
+const limit = size ? +size : 3 ;
+const offset = page ? page * limit : 0  ; 
+return { limit , offset } ; 
+} ; 
+
+
+//retrieve all tuts from db 
+
+
+
 //create and save a new tutorial
 exports.create = (req, res) => {
   //      validate request
@@ -27,6 +38,28 @@ exports.create = (req, res) => {
 };
 
 //retrieve all the tutorials
+exports.findAll = ( req, res,) => { 
+  const { page , size , title } = req.query ; 
+  var condition = title 
+        ? { title: { $regex: new RegExp(title) , $options: "i" }  }
+        : { } ; 
+  const {limit , offset } = getPagination(page , size ) ;
+  Tutorial.paginate(condition , { offset , limit } )
+        .then( (data) => { 
+          res.send({ 
+            totalItems: data.totalDocs , 
+            tutorials: data.docs , 
+            totalPages: data.totalPages , 
+            currentPage: data.page -1 , 
+          });
+        })
+        .catch( (err) => {
+          res.status(500).send({
+            message: err.message || "Some error occured while retrieving tutorials",
+          });
+        });
+};
+/*
 exports.findAll = (req, res) => {
   const title = req.query.title || "";
   var condition = title
@@ -41,7 +74,7 @@ exports.findAll = (req, res) => {
         message: err.message || "Something went wrong .",
       });
     });
-};
+};*/
 
 //Find a single tutorial by its ID
 exports.findOne = (req, res) => {

@@ -1,17 +1,19 @@
-const router = require('express').Router();
+//const router = require('express').Router();
 const tutorials = require('../controllers/tutorial.controller');
 //create new tutorial
-router.post("/",tutorials.create);
+module.exports = function(app) {
+app.post("/",tutorials.create);
 
-router.get("/", tutorials.findAll);
+app.get("/tutorials", tutorials.findAll);
 
-router.get("/:id", tutorials.findOne);
+app.get("/:id", tutorials.findOne);
 
-router.put("/:id" , tutorials.update);
+app.put("/:id" , tutorials.update);
 
-router.delete("/:id" , tutorials.delete);
+app.delete("/:id" , tutorials.delete);
 
-router.delete("/",tutorials.deleteAll)
+app.delete("/",tutorials.deleteAll)
 
-module.exports = router; 
+//module.exports = router; 
 
+}
