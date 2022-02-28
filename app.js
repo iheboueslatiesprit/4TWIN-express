@@ -5,16 +5,12 @@ var app = express();
 var corsOptions = {
   origin: "http://localhost:8081"
 };
-var createError = require('http-errors');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
+const { errorHandler } = require('./middleware/errorHandler') ; 
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+app.use(express.urlencoded({ extended: false }));
+app.use(errorHandler) ; 
 const db = require("./models")
 const Role = require('./models/role.model');
 
@@ -36,20 +32,6 @@ db.mongoose
   require('./routes/auth.routes')(app);
   require('./routes/user.routes')(app);
   require('./routes/tutorials')(app);
- // var authRouter = require('./routes/auth.routes');
- //var userRouter = require('./routes/user.routes');
- /* esvar indexRouter = require('./routes/index');
- var usersRouter = require('./routes/users');
- var osRouter = require('./routes/os');
- var productsRouter = require('./routes/products');
- var tutorialsRouter = require('./routes/tutorials'); 
- 
-//app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/os',osRouter);
-app.use('/products',productsRouter); */
-//app.use('/', authRouter);
-//app.use('/', userRouter);
 
 const port = process.env.PORT || 5000;
 
@@ -57,6 +39,7 @@ app.listen(port , () => `Server running on port ${port} `);
 
 //bezkoder nodejsmongodbauthjwt
 function initial() {
+  
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       new Role({
@@ -87,6 +70,4 @@ function initial() {
   });
 }
 
-//bezkoder : listen for requests
-//const PORT = process.env.PORT || 8080 ;
 module.exports = app;

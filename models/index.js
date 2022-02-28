@@ -10,7 +10,7 @@ db.url = dbConfig.url;
 db.tutorials = require("./tutorial.model.js")(mongoose, mongoosePaginate);
 db.user = require("./user.model")
 db.role = require("./role.model")
-
+db.resfreshToken = require("./refreshToken.model");
 db.ROLES = ["user" , "admin" , "moderator"];
 
 module.exports = db;
