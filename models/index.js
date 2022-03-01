@@ -5,7 +5,10 @@ mongoose.Promise = global.Promise;
  
 const db = {};
 db.mongoose = mongoose;
-db.url = dbConfig.url;
+db.localUrl = dbConfig.localUrl;
+db.atlasUrl = dbConfig.atlasUrl;
+db.HOST = dbConfig.HOST;
+db.PORT = dbConfig.PORT;
 
 db.tutorials = require("./tutorial.model.js")(mongoose, mongoosePaginate);
 db.user = require("./user.model")
